@@ -1,0 +1,25 @@
+Menu
+
+Burgers
+- Big Mac: $6
+- Cheeseburger: $5
+- McChicken Burger: $6.50
+- McCrispy: $7
+- McCrispy Bacon Deluxe: $7.50
+- McCrispy Double: $9
+- Quarter Pounder: $7
+- Quarter Pounder Double: $8
+- Quarter Pounder Double: $8
+- Quarter Pounder Double: $8
+
+
+Sides
+- Fries: $3
+- Chicken Nuggets: $4
+- Ice Cream: $2.50
+
+Drinks
+- Coke: $2
+- Coke Zero Sugar: $2
+- Fanta Orange: $2.50
+- Sprite Zero: $2.50

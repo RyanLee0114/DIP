@@ -1,13 +1,60 @@
 import tkinter as tk
 from tkinter import messagebox
+from typing import Iterator, List
+
+
+class FoodItem:
+
+
+    def __init__(self, name: str, price: int) -> None:
+        self.name = name
+        self.price = price
+
+
+class Menu:
+    def __init__(self) -> None:
+        self._items: List[FoodItem] = [
+            FoodItem("Big Mac", 6),
+            FoodItem("Fries", 3),
+            FoodItem("Coke", 2),
+            FoodItem("Chicken Nuggets", 4),
+            FoodItem("Ice Cream", 2),
+            FoodItem("Cheeseburger", 5),
+        ]
+
+    def items(self) -> List[FoodItem]:
+        return list(self._items)
+
+
+class Cart:
+
+    def __init__(self) -> None:
+        self._items: List[FoodItem] = []
+
+    def add_item(self, item: FoodItem) -> None:
+        self._items.append(item)
+
+    def clear(self) -> None:
+        self._items.clear()
+
+    @property
+    def total(self) -> int:
+        return sum(item.price for item in self._items)
+
+    def __iter__(self) -> Iterator[FoodItem]:
+        return iter(self._items)
+
+    def __len__(self) -> int:
+        return len(self._items)
+
 
 class KioskApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Kiosk")
         self.root.attributes("-fullscreen", True)  # Fullscreen
-        self.cart = []
-        self.total_price = 0
+        self.menu = Menu()
+        self.cart = Cart()
 
         self.show_main_menu()
 
@@ -24,21 +71,12 @@ class KioskApp:
         items_frame = tk.Frame(main_frame, bg='skyblue')
         items_frame.pack(expand=True)
 
-        food_items = [
-            {"name": "Big Mac", "price": 6},
-            {"name": "Fries", "price": 3},
-            {"name": "Coke", "price": 2},
-            {"name": "Chicken Nuggets", "price": 4},
-            {"name": "Ice Cream", "price": 2},
-            {"name": "Cheeseburger", "price": 5},
-        ]
-
         row, col = 0, 0
-        for item in food_items:
+        for item in self.menu.items():
             frame = tk.Frame(items_frame, bg='hotpink', width=150, height=120)
             frame.grid(row=row, column=col, padx=15, pady=15)
-            tk.Label(frame, text=item['name'], bg='hotpink', font=('Arial', 12)).pack(pady=10)
-            tk.Label(frame, text=f"${item['price']}", bg='hotpink', font=('Arial', 10)).pack()
+            tk.Label(frame, text=item.name, bg='hotpink', font=('Arial', 12)).pack(pady=10)
+            tk.Label(frame, text=f"${item.price}", bg='hotpink', font=('Arial', 10)).pack()
             tk.Button(frame, text="Add", command=lambda i=item: self.add_to_cart(i)).pack(pady=5)
 
             col += 1
@@ -48,10 +86,9 @@ class KioskApp:
 
         tk.Button(main_frame, text="Check Out", bg='orange', font=('Arial', 14), command=self.show_dine_option).pack(pady=20)
 
-    def add_to_cart(self, item):
-        self.cart.append(item)
-        self.total_price += item['price']
-        messagebox.showinfo("Item Added", f"{item['name']} added to cart.")
+    def add_to_cart(self, item: FoodItem):
+        self.cart.add_item(item)
+        messagebox.showinfo("Item Added", f"{item.name} added to cart.")
 
     def show_dine_option(self):
         self.clear_screen()
@@ -68,10 +105,13 @@ class KioskApp:
         for item in self.cart:
             frame = tk.Frame(self.root, bg='lightcyan', padx=10, pady=5)
             frame.pack(pady=5, fill='x')
-            tk.Label(frame, text=item['name'], font=('Arial', 14), width=20).pack(side='left')
-            tk.Label(frame, text=f"${item['price']}", font=('Arial', 14)).pack(side='right')
+            tk.Label(frame, text=item.name, font=('Arial', 14), width=20).pack(side='left')
+            tk.Label(frame, text=f"${item.price}", font=('Arial', 14)).pack(side='right')
 
-        tk.Label(self.root, text=f"Total: ${self.total_price}", font=('Arial', 20)).pack(pady=20)
+        if len(self.cart) == 0:
+            tk.Label(self.root, text="Your cart is empty.", font=('Arial', 14)).pack(pady=20)
+
+        tk.Label(self.root, text=f"Total: ${self.cart.total}", font=('Arial', 20)).pack(pady=20)
         tk.Button(self.root, text="Proceed to Payment", bg='orange', font=('Arial', 16), command=self.show_payment).pack(pady=20)
 
     def show_payment(self):
@@ -90,11 +130,12 @@ class KioskApp:
 
     def reset(self):
         self.cart.clear()
-        self.total_price = 0
         self.show_main_menu()
 
 
 # Run it
+# Entry point: construct the Tk root window and start the kiosk UI loop.
+# Handy for manual smoke tests without importing the module elsewhere.
 root = tk.Tk()
 app = KioskApp(root)
 root.mainloop()
